@@ -1,0 +1,8 @@
+{
+  "name": "libpulse-root-runner",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npm install --prefix Library-backend",
+    "start": "node Library-backend/server.js"
+  }
+}
