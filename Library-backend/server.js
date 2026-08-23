@@ -2,9 +2,11 @@ const path = require('path');
 const dns = require('dns');
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 
-app.use(express.static(path.join(__dirname, '..')));
+const ROOT_DIR = process.cwd();
+app.use(express.static(ROOT_DIR));
+
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'index.html'));
+  res.sendFile(path.resolve(ROOT_DIR, 'index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
