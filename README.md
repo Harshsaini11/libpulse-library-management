@@ -2,6 +2,8 @@
 
 **LibPulse** is a modern, responsive full-stack web application designed to simplify book cataloging, member registration, automated loan duration tracking, late-fee penalties, and activity audit logging.
 
+Live link : [https://libpulse-library-management-xw72.onrender.com]
+
 ---
 
 ## ✨ Key Features
