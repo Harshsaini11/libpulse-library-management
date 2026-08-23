@@ -1,5 +1,16 @@
+const path = require('path');
 const dns = require('dns');
 dns.setServers(['8.8.8.8', '8.8.4.4']);
+
+app.use(express.static(path.join(__dirname, '..')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'index.html'));
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 const express = require('express');
 const mongoose = require('mongoose');
