@@ -1,28 +1,12 @@
 const path = require('path');
-const dns = require('dns');
-dns.setServers(['8.8.8.8', '8.8.4.4']);
-
-const ROOT_DIR = process.cwd();
-app.use(express.static(ROOT_DIR));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(ROOT_DIR, 'index.html'));
-});
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
-
 const multer = require('multer');
 const xlsx = require('xlsx');
+require('dotenv').config();
 
-const upload = multer({ storage: multer.memoryStorage() });
+// Models
 const Book = require('./models/Book');
 const User = require('./models/User');
 const Log = require('./models/Log');
@@ -30,21 +14,37 @@ const Setting = require('./models/Setting');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const upload = multer({ storage: multer.memoryStorage() });
 
+// Middlewares
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+// Frontend Static Files Serve (Root Directory se)
+const ROOT_DIR = path.join(__dirname, '..');
+app.use(express.static(ROOT_DIR));
+
 // --- DATABASE CONNECTION & INIT ---
-mongoose.connect(process.env.MONGO_URI)
-  .then(async () => {
-    console.log('✅ Connected to MongoDB Atlas Successfully');
-    const fineSetting = await Setting.findOne({ key: 'dailyFineRate' });
-    if (!fineSetting) {
-      await Setting.create({ key: 'dailyFineRate', value: parseInt(process.env.DEFAULT_FINE_RATE) || 5 });
-    }
-  })
-  .catch((err) => console.error('MongoDB Connection Error:', err));
+const MONGO_URI = process.env.MONGO_URI;
+
+if (MONGO_URI) {
+  mongoose.connect(MONGO_URI)
+    .then(async () => {
+      console.log(' Connected to MongoDB Atlas Successfully');
+      try {
+        const fineSetting = await Setting.findOne({ key: 'dailyFineRate' });
+        if (!fineSetting) {
+          await Setting.create({ key: 'dailyFineRate', value: parseInt(process.env.DEFAULT_FINE_RATE) || 5 });
+        }
+      } catch (e) {
+        console.warn('Setting init check skipped:', e.message);
+      }
+    })
+    .catch((err) => console.error('MongoDB Connection Error:', err.message));
+} else {
+  console.warn('⚠️ MONGO_URI is missing in environment variables');
+}
 
 // Activity Log Helper
 async function recordLog(action, details) {
@@ -157,7 +157,6 @@ app.post('/api/books/issue', async (req, res) => {
       return res.status(400).json({ message: 'Both Book ID and User ID are required' });
     }
 
-    // 1. Strict Member Existence Check
     const user = await User.findOne({
       customId: { $regex: new RegExp(`^${cleanUserId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
     });
@@ -168,7 +167,6 @@ app.post('/api/books/issue', async (req, res) => {
       });
     }
 
-    // 2. Find Book
     const book = await Book.findOne({
       customId: { $regex: new RegExp(`^${cleanBookId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
     });
@@ -251,7 +249,6 @@ app.delete('/api/books/:identifier', async (req, res) => {
     const { identifier } = req.params;
     const cleanIdentifier = decodeURIComponent(identifier).trim();
 
-    // ID ya Title dono me se kisi ek se match karega (Title case-insensitive)
     const book = await Book.findOne({
       $or: [
         { customId: cleanIdentifier },
@@ -361,7 +358,6 @@ app.delete('/api/users/:customId', async (req, res) => {
   try {
     const cleanId = String(req.params.customId).trim();
 
-    // Check if user has active borrowed books
     const hasIssuedBooks = await Book.findOne({ issuedTo: cleanId });
     if (hasIssuedBooks) {
       return res.status(400).json({ message: 'Cannot delete member with active borrowed books' });
@@ -376,7 +372,6 @@ app.delete('/api/users/:customId', async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
-
 
 // --- OPTIMIZED BATCH RESOLVE (Books) ---
 app.post('/api/books/batch-resolve', async (req, res) => {
@@ -412,9 +407,7 @@ app.post('/api/books/batch-resolve', async (req, res) => {
       }
     });
 
-    // Executes all 1000 operations in a single atomic database query
     const result = await Book.bulkWrite(operations, { ordered: false });
-    
     const inserted = result.insertedCount || (result.upsertedCount || 0);
     const modified = result.modifiedCount || 0;
 
@@ -467,8 +460,6 @@ app.post('/api/users/batch-resolve', async (req, res) => {
 });
 
 // --- SETTINGS & AUDIT LOGS ---
-
-// Get / Set Fine Policy
 app.get('/api/settings/fine-rate', async (req, res) => {
   const setting = await Setting.findOne({ key: 'dailyFineRate' });
   res.json({ rate: setting ? setting.value : 5 });
@@ -526,7 +517,6 @@ app.post('/api/books/upload-excel', upload.single('file'), async (req, res) => {
         continue;
       }
 
-      // Duplicate Check
       const exists = await Book.findOne({ customId });
       if (exists) {
         skippedCount++;
@@ -587,6 +577,12 @@ app.post('/api/users/upload-excel', upload.single('file'), async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// Fallback Route for Single Page Application (SPA)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(ROOT_DIR, 'index.html'));
+});
+
+// Single Unified Server Listener
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
