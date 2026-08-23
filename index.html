@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LibPulse &bull; Library Management & Fine System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<div class="app-layout">
+  <!-- Left Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-glow"></div>
+      <div class="brand-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+          <path d="M6 6h10M6 10h10"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h2>Lib<span>Pulse</span></h2>
+        <p>Pro Suite & Fine Engine</p>
+      </div>
+    </div>
+
+    <div class="sidebar-scroll">
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Inventory Actions</div>
+        
+        <button class="nav-item" onclick="openActionModal('modalAddBook')">
+          <div class="nav-icon icon-add">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+          </div>
+          <span>Add Book</span>
+        </button>
+
+        <button class="nav-item" onclick="openActionModal('modalEditBook')">
+          <div class="nav-icon icon-edit">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+          </div>
+          <span>Edit Book</span>
+        </button>
+
+        <button class="nav-item" onclick="openActionModal('modalIssueBook')">
+          <div class="nav-icon icon-issue">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m5 12 5 5L20 7"/></svg>
+          </div>
+          <span>Issue Book (Duration)</span>
+        </button>
+
+        <button class="nav-item" onclick="openActionModal('modalReturnBook')">
+          <div class="nav-icon icon-return">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          </div>
+          <span>Return & Calculate Fine</span>
+        </button>
+
+        <button class="nav-item nav-danger" onclick="openActionModal('modalDeleteBook')">
+          <div class="nav-icon icon-delete">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+          </div>
+          <span>Delete Book</span>
+        </button>
+
+        <div class="nav-section-label">Management & Finance</div>
+
+        <button class="nav-item" onclick="openUsersModal()">
+          <div class="nav-icon icon-users">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <span>Member Registration</span>
+        </button>
+
+      </nav>
+    </div>
+
+   <!-- Clickable Profile for Fine Settings -->
+    <div class="sidebar-user" onclick="openSettingsModal()" style="cursor: pointer;" title="Click to change fine policy">
+      <div class="user-avatar">HS</div>
+      <div class="user-info">
+        <h4>Harsh Saini</h4>
+        <p>Admin &bull; ₹<span id="txtSidebarFineRate">5</span>/day fine ⚙️</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Viewport -->
+  <main class="main-wrapper">
+    <header class="hero-topbar">
+      <div class="hero-glow-layer"></div>
+
+      <div class="hero-content-left">
+        <div class="hero-pill-badge">
+          <span class="live-pulse-dot"></span>
+          <span>ENTERPRISE SYSTEM ACTIVE</span>
+        </div>
+        <h1 class="hero-title">Library Overview &amp; Fine Desk</h1>
+        <p class="hero-subtitle">Real-time inventory management, automated overdue calculation &amp; penalties</p>
+      </div>
+
+      <div class="hero-content-right">
+        <!-- Live Time Glass Widget -->
+        <div class="glass-clock-widget">
+          <div class="clock-icon-bubble">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="clock-details">
+            <span class="clock-label">SYSTEM TIME</span>
+            <span class="clock-value" id="lblLiveClock">--:--:-- --</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="hero-action-buttons">
+        <button class="hero-btn btn-ghost" type="button" onclick="refreshList()" title="Sync Database">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+            <path d="M16 21h5v-5"/>
+          </svg>
+          <span>Sync Data</span>
+        </button>
+
+          <button class="hero-btn btn-gradient" onclick="printTable('booksInventorySection')" title="Print / Export Report">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+            <span>Export Report</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Metrics Cards -->
+    <section class="metrics-grid">
+      <div class="metric-card metric-total">
+        <div class="metric-inner">
+          <span class="metric-label">Total Books</span>
+          <span class="metric-value" id="statTotalBooks">0</span>
+          <span class="metric-sub">Cataloged Volume</span>
+        </div>
+        <div class="metric-icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+      </div>
+
+      <div class="metric-card metric-available">
+        <div class="metric-inner">
+          <span class="metric-label">Available Copies</span>
+          <span class="metric-value" id="statAvailableBooks">0</span>
+          <span class="metric-sub">Ready to loan</span>
+        </div>
+        <div class="metric-icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+      </div>
+
+      <div class="metric-card metric-issued">
+        <div class="metric-inner">
+          <span class="metric-label">Issued Books</span>
+          <span class="metric-value" id="statIssuedBooks">0</span>
+          <span class="metric-sub">Under active loans</span>
+        </div>
+        <div class="metric-icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+      </div>
+
+      <div class="metric-card metric-fine">
+        <div class="metric-inner">
+          <span class="metric-label">Unpaid Fines</span>
+          <span class="metric-value">₹<span id="statTotalFines">0</span></span>
+          <span class="metric-sub"><span id="statOverdueCount">0</span> overdue loan(s)</span>
+        </div>
+        <div class="metric-icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/><path d="M12 18h.01"/></svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- Table Container -->
+    <section class="card table-card print-area" id="booksInventorySection">
+  <!-- Top Tab Navigation Bar -->
+  <div class="view-tab-bar">
+    <button type="button" class="view-tab-btn active" id="tabViewBooks" onclick="switchDashboardView('books')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Books Catalog
+      <span class="tab-badge" id="badgeTotalBooks">0</span>
+    </button>
+    <button type="button" class="view-tab-btn" id="tabViewUsers" onclick="switchDashboardView('users')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Members & Users
+      <span class="tab-badge" id="badgeTotalUsers">0</span>
+    </button>
+    <button type="button" class="view-tab-btn" id="tabViewLogs" onclick="switchDashboardView('logs')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      System Audit Trail & Fine Collections
+      <span class="tab-badge" id="badgeTotalLogs">0</span>
+    </button>
+  </div>
+
+  <!-- Dynamic Search & Filter Toolbar -->
+<div class="table-toolbar">
+  <div class="search-box">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input type="text" id="txtSearch" placeholder="Search by Book ID, Title, Author, Borrower..." oninput="handleUnifiedSearch()" />
+  </div>
+
+  <!-- Books Filter Dropdown -->
+  <div class="filter-controls" id="containerFilterBooks">
+    <select id="comboFilterBooks" onchange="handleUnifiedSearch()">
+      <option value="All">All Books</option>
+      <option value="Available">Available (In Stock)</option>
+      <option value="Issued">Issued (Active)</option>
+      <option value="Overdue">Overdue / Fine Due</option>
+    </select>
+  </div>
+
+  <!-- Users / Members Filter Dropdown -->
+  <div class="filter-controls" id="containerFilterUsers" style="display: none;">
+    <select id="comboFilterUsers" onchange="handleUnifiedSearch()">
+      <option value="All">All Members</option>
+      <option value="ActiveLoans">Active Borrowers (Issued)</option>
+      <option value="NoLoans">No Active Loans (0 Books)</option>
+      <option value="HasFine">Members with Fine Due</option>
+    </select>
+  </div>
+
+  <!-- Audit Logs Filter Dropdown -->
+  <div class="filter-controls" id="containerFilterLogs" style="display: none;">
+    <select id="comboFilterLogs" onchange="handleUnifiedSearch()">
+      <option value="All">All Actions</option>
+      <option value="ISSUE_BOOK">Issue Book Logs</option>
+      <option value="RETURN_BOOK">Return Book Logs</option>
+      <option value="ADD_BOOK">Add Book Logs</option>
+      <option value="DELETE_BOOK">Delete Book Logs</option>
+    </select>
+  </div>
+</div>
+
+  <!-- 1. Books Table View -->
+  <div class="table-responsive" id="viewBooksContainer">
+    <table id="booksTable">
+      <thead>
+        <tr>
+          <th style="width: 85px;">ID</th>
+          <th>Book Title</th>
+          <th>Author</th>
+          <th>Status</th>
+          <th>Borrower</th>
+          <th>Due Date</th>
+          <th>Overdue & Fine</th>
+        </tr>
+      </thead>
+      <tbody id="booksTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- 2. Users Table View -->
+  <div class="table-responsive" id="viewUsersContainer" style="display: none;">
+    <table id="usersTable">
+      <thead>
+        <tr>
+          <th style="width: 100px;">User ID</th>
+          <th>Member Name</th>
+          <th>Active Loans</th>
+          <th>Currently Borrowed Books</th>
+          <th>Total Fine Due</th>
+        </tr>
+      </thead>
+      <tbody id="usersTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- 3. Audit Logs Table View -->
+  <div class="table-responsive" id="viewLogsContainer" style="display: none;">
+    <table id="logsTable">
+      <thead>
+        <tr>
+          <th style="width: 60px; text-align: center;">#</th>
+          <th style="width: 200px;">Timestamp</th>
+          <th style="width: 180px;">Action</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody id="logsTableBody"></tbody>
+    </table>
+  </div>
+    </section>
+ 
+<!-- Sleek Enterprise Developer Footer -->
+    <footer class="hero-footer-card">
+      <div class="footer-card-inner">
+        <!-- Left: Brand & Engine Meta -->
+        <div class="footer-meta-block">
+          <div class="footer-logo-wrap">
+            <div class="footer-icon-square">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2">
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+                <path d="M6 6h10M6 10h10"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="footer-brand-heading">LibPulse <span>Pro</span></h4>
+              <p class="footer-brand-sub">&copy; 2026 Enterprise Automated Fine Engine</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center: Status & Fine Pill -->
+        <div class="footer-center-block">
+          <div class="footer-telemetry-badge">
+            <span class="telemetry-dot"></span>
+            <span>Policy: <strong>₹<span id="lblFooterFineRate">5</span> / Overdue Day</strong></span>
+          </div>
+        </div>
+
+        <!-- Right: Developer Attribution & Social Cards -->
+        <div class="footer-dev-block">
+          <span class="dev-tag">Developer &bull; <strong>Harsh Kumar Saini</strong></span>
+          <div class="footer-social-deck">
+            <!-- GitHub Link -->
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-deck-btn gh" title="GitHub Profile">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+              </svg>
+              <span>GitHub</span>
+            </a>
+
+            <!-- LinkedIn Link -->
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-deck-btn in" title="LinkedIn Profile">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.2a1.64 1.64 0 1 0 0 3.28 1.64 1.64 0 0 0 0-3.28z"/>
+              </svg>
+              <span>LinkedIn</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+ 
+  </main>
+</div>
+
+<!-- ================= GLASS MODALS ================= -->
+
+<!-- Modal: Add Book (Manual + Excel Bulk Upload) -->
+<div class="modal-backdrop" id="modalAddBook">
+  <div class="modal-card modal-sm">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <div class="modal-icon-badge bg-primary-gradient">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+        </div>
+        <div>
+          <h3>Register Books</h3>
+          <p>Add single entry manually or import via Excel</p>
+        </div>
+      </div>
+      
+      <button class="btn-close" onclick="closeModal('modalAddBook')">&times;</button>
+    </div>
+
+    <!-- Toggle Buttons for Mode -->
+    <div class="modal-tab-group">
+      <button type="button" class="tab-btn active" id="tabBookManual" onclick="switchBookInputMode('manual')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Manual Entry
+      </button>
+      <button type="button" class="tab-btn" id="tabBookExcel" onclick="switchBookInputMode('excel')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Bulk Excel Upload
+      </button>
+    </div>
+
+    <!-- Mode 1: Manual Form -->
+    <form id="formAddBookManual" onsubmit="handleAddBook(event)">
+  <div class="modal-body stack-form">
+    <div class="input-group">
+      <label>Book ID <span class="req">*</span></label>
+      <input type="text" id="txtAddBookId" placeholder="e.g. BK0001 or 101" required />
+    </div>
+    <div class="input-group">
+      <label>Book Title <span class="req">*</span></label>
+      <input type="text" id="txtAddTitle" placeholder="e.g. Clean Code" required />
+    </div>
+    <div class="input-group">
+      <label>Author Name <span class="req">*</span></label>
+      <input type="text" id="txtAddAuthor" placeholder="e.g. Robert C. Martin" required />
+    </div>
+    <div id="msgAddBook" class="modal-feedback"></div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" onclick="closeModal('modalAddBook')">Cancel</button>
+    <button type="submit" class="btn btn-primary">Save Book</button>
+  </div>
+</form>
+
+    <!-- Mode 2: Excel Dropzone -->
+    <div id="dropzoneBookExcel" class="modal-body" style="display: none;">
+      <div class="excel-upload-card" onclick="document.getElementById('fileImportBooksModal').click()">
+        <input type="file" id="fileImportBooksModal" accept=".xlsx, .xls, .csv" style="display: none;" onchange="handleExcelUpload('books', this)" />
+        <div class="upload-icon-circle bg-primary-gradient">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <h4>Upload Books Excel Sheet</h4>
+        <p>Click to browse or drop your <code>.xlsx</code> / <code>.csv</code> file here</p>
+        <span class="file-format-badge">Required Columns: Book ID, Title, Author</span>
+      </div>
+      <div class="modal-footer" style="padding: 16px 0 0 0; background: transparent;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modalAddBook')">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Edit Book -->
+<div class="modal-backdrop" id="modalEditBook">
+  <div class="modal-card modal-sm">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <div class="modal-icon-badge bg-violet-gradient">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+        </div>
+        <div>
+          <h3>Edit Book Record</h3>
+          <p>Update title and author details</p>
+        </div>
+      </div>
+      <button class="btn-close" onclick="closeModal('modalEditBook')">&times;</button>
+    </div>
+    <form onsubmit="handleEditBook(event)">
+      <div class="modal-body stack-form">
+        <div class="input-group">
+          <label>Target Book ID <span class="req">*</span></label>
+          <input type="text" id="txtEditBookId" placeholder="Enter ID to update" required />
+        </div>
+        <div class="input-group">
+          <label>Updated Title <span class="req">*</span></label>
+          <input type="text" id="txtEditTitle" placeholder="New title" required />
+        </div>
+        <div class="input-group">
+          <label>Updated Author <span class="req">*</span></label>
+          <input type="text" id="txtEditAuthor" placeholder="New author" required />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modalEditBook')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Issue Book -->
+<div class="modal-backdrop" id="modalIssueBook">
+  <div class="modal-card modal-sm">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <div class="modal-icon-badge bg-emerald-gradient">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
+        <div>
+          <h3>Issue Book & Set Loan Period</h3>
+          <p>Set duration in days for automatic due date & late fine</p>
+        </div>
+      </div>
+      <button class="btn-close" type="button" onclick="closeModal('modalIssueBook')">&times;</button>
+    </div>
+
+    <form id="formIssueBook" onsubmit="handleIssueBook(event)">
+      <div class="modal-body stack-form">
+        <div class="input-group">
+          <label>Book ID <span class="req">*</span></label>
+          <input type="text" id="txtIssueBookId" placeholder="e.g. BK0001" required />
+        </div>
+        <div class="input-group">
+          <label>Borrower User ID <span class="req">*</span></label>
+          <input type="text" id="txtIssueUserId" placeholder="e.g. ST0021" required />
+        </div>
+        <div class="input-group">
+          <label>Loan Duration (Days) <span class="req">*</span></label>
+          <div class="preset-pill-group" style="display: flex; gap: 8px; margin-bottom: 8px;">
+            <button type="button" class="btn-preset active" onclick="setLoanPreset(7, this)">7 Days</button>
+            <button type="button" class="btn-preset" onclick="setLoanPreset(14, this)">14 Days</button>
+            <button type="button" class="btn-preset" onclick="setLoanPreset(30, this)">30 Days</button>
+          </div>
+          <input type="number" id="numLoanDays" value="7" min="1" max="90" required />
+          <small class="hint-text">Late fine applies after the return deadline.</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modalIssueBook')">Cancel</button>
+        <button type="submit" class="btn btn-emerald" id="btnSubmitIssue">Issue Book</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Return Book (with Fine Detection & Collection) -->
+<div class="modal-backdrop" id="modalReturnBook">
+  <div class="modal-card modal-sm">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <div class="modal-icon-badge bg-cyan-gradient">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        </div>
+        <div>
+          <h3>Return & Fine Settlement</h3>
+          <p>Inspect book status, overdue calculation, and complete return</p>
+        </div>
+      </div>
+      <button class="btn-close" onclick="closeModal('modalReturnBook')">&times;</button>
+    </div>
+    <form onsubmit="handleReturnBook(event)">
+      <div class="modal-body stack-form">
+        <div class="input-group">
+          <label>Book ID to Return <span class="req">*</span></label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="txtReturnBookId" placeholder="Enter Book ID" oninput="checkReturnBookPreview()" required style="flex: 1;" />
+            <button type="button" class="btn btn-glass" onclick="checkReturnBookPreview()">Check</button>
+          </div>
+        </div>
+
+        <!-- Dynamic Return & Fine Summary Card -->
+        <div id="returnPreviewBox" class="return-summary-box" style="display: none;">
+          <div class="return-summary-header">
+            <h4 id="previewBookTitle">-</h4>
+            <span id="previewBadge" class="status-pill">-</span>
+          </div>
+          <div class="summary-details">
+            <div><span class="lbl">Borrower:</span> <strong id="previewBorrower">-</strong></div>
+            <div><span class="lbl">Issued Date:</span> <span id="previewIssuedDate">-</span></div>
+            <div><span class="lbl">Due Date:</span> <span id="previewDueDate">-</span></div>
+            <div><span class="lbl">Overdue Days:</span> <strong id="previewOverdueDays" class="text-danger">0</strong></div>
+          </div>
+          <div class="fine-due-banner" id="fineBanner">
+            <span>Calculated Fine:</span>
+            <strong id="previewFineAmount">₹0</strong>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modalReturnBook')">Cancel</button>
+        <button type="submit" class="btn btn-cyan" id="btnConfirmReturn">Confirm & Process Return</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Delete Book -->
+<div class="modal-backdrop" id="modalDeleteBook">
+  <div class="modal-card modal-sm">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <div class="modal-icon-badge bg-rose-gradient">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </div>
+        <div>
+          <h3>Remove Book</h3>
+          <p>Delete book by entering its ID or Title</p>
+        </div>
+      </div>
+      <button class="btn-close" onclick="closeModal('modalDeleteBook')">&times;</button>
+    </div>
+    
+    <form onsubmit="handleDeleteBook(event)">
+      <div class="modal-body stack-form">
+        <div class="input-group">
+          <label>Book ID or Book Title <span class="req">*</span></label>
+          <input type="text" id="txtDeleteBookIdentifier" placeholder="e.g. BK0001 or The Great Gatsby" required />
+        </div>
+      <div id="msgDeleteBook" class="modal-feedback"></div> 
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modalDeleteBook')">Cancel</button>
+        <button type="submit" class="btn btn-rose">Delete Book</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Settings (Fine Rate) -->
+<div class="modal-backdrop" id="modalSettings">
+  <div class="modal-card modal-sm">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <div class="modal-icon-badge bg-primary-gradient">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </div>
+        <div>
+          <h3>Fine Policy Settings</h3>
+          <p>Configure default daily late penalty rate</p>
+        </div>
+      </div>
+      <button class="btn-close" onclick="closeModal('modalSettings')">&times;</button>
+    </div>
+    <form onsubmit="handleSaveFineRate(event)">
+      <div class="modal-body stack-form">
+        <div class="input-group">
+          <label>Daily Fine Amount (₹ per overdue day) <span class="req">*</span></label>
+          <input type="number" id="txtDailyFineRate" min="1" max="500" required />
+          <p class="helper-text">This rate is dynamically calculated for all current and future overdue loans.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modalSettings')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Fine Policy</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Users Directory & Fine Overview -->
+<div class="modal-backdrop" id="userModal">
+  <div class="modal-card modal-sm">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <div class="modal-icon-badge bg-primary-gradient">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div>
+          <h3>Member Registration</h3>
+          <p>Register individual member or upload list via Excel</p>
+        </div>
+      </div>
+      <button class="btn-close" type="button" onclick="closeModal('userModal')">&times;</button>
+    </div>
+
+    <!-- Toggle Tabs -->
+    <div class="modal-tab-group" style="padding: 14px 24px 0 24px;">
+      <button type="button" class="tab-btn active" id="tabUserManual" onclick="switchUserInputMode('manual')">
+        Manual Entry
+      </button>
+      <button type="button" class="tab-btn" id="tabUserExcel" onclick="switchUserInputMode('excel')">
+        Bulk Members (.xlsx)
+      </button>
+    </div>
+
+    <div class="modal-body stack-form" style="padding-top: 16px;">
+      <!-- Mode 1: Manual Form (Vertical Stack just like Add Book) -->
+      <div id="userManualControls" class="stack-form" style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="input-group">
+          <label>Member / User ID <span class="req">*</span></label>
+          <input type="text" id="txtUserId" placeholder="e.g. ST0035 or USR101" required />
+        </div>
+
+        <div class="input-group">
+          <label>Member Full Name <span class="req">*</span></label>
+          <input type="text" id="txtUserName" placeholder="e.g. Rahul Sharma" required />
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 6px;">
+          <button type="button" class="btn btn-primary" style="flex: 1;" onclick="handleAddUser()">Add Member</button>
+          <button type="button" class="btn btn-secondary" onclick="handleEditUser()">Edit Name</button>
+          <button type="button" class="btn btn-rose-light" onclick="handleDeleteUser()" title="Delete Member">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
+        <div id="msgUserModal" class="modal-feedback"></div>
+      </div>
+
+      <!-- Mode 2: Excel Dropzone (Clean Card like Add Book) -->
+      <div id="userExcelControls" class="excel-upload-card" style="display: none;" onclick="document.getElementById('fileImportUsersModal').click()">
+        <input type="file" id="fileImportUsersModal" accept=".xlsx, .xls, .csv" style="display: none;" onchange="handleExcelUpload('users', this)" />
+        <div class="upload-icon-circle bg-emerald-gradient">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <h4>Upload Members Excel Sheet</h4>
+        <p>Click to upload bulk members file</p>
+        <span class="file-format-badge">Required Columns: User ID, Name</span>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="closeModal('userModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal: Duplicate Conflict Resolver -->
+<div class="modal-backdrop" id="modalConflictResolver" style="z-index: 3000;">
+  <div class="modal-card modal-sm" style="max-width: 540px;">
+    <div class="modal-header" style="background: #fff1f2; border-bottom: 1px solid #fecdd3;">
+      <div class="modal-title-group">
+        <div class="modal-icon-badge bg-rose-gradient">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div>
+          <h3 style="color: #9f1239;">Duplicate Record Detected</h3>
+          <p id="conflictProgressText" style="color: #be123c; font-weight: 600;">Resolving conflict 1 of 1</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <div class="conflict-comparison-card">
+        <div class="conflict-side">
+          <span class="conflict-tag tag-old">Existing Database Record</span>
+          <div class="conflict-detail">
+            <div><span class="lbl">ID:</span> <strong id="conflictOldId">-</strong></div>
+            <div><span class="lbl">Name/Title:</span> <strong id="conflictOldTitle">-</strong></div>
+            <div id="conflictOldAuthorRow"><span class="lbl">Author:</span> <span id="conflictOldAuthor">-</span></div>
+          </div>
+        </div>
+
+        <div class="conflict-side">
+          <span class="conflict-tag tag-new">New Incoming (Excel)</span>
+          <div class="conflict-detail">
+            <div><span class="lbl">ID:</span> <strong id="conflictNewId">-</strong></div>
+            <div><span class="lbl">Name/Title:</span> <strong id="conflictNewTitle">-</strong></div>
+            <div id="conflictNewAuthorRow"><span class="lbl">Author:</span> <span id="conflictNewAuthor">-</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer" style="display: flex; flex-direction: column; gap: 8px; background: #fafafa;">
+      <div style="display: flex; width: 100%; gap: 8px;">
+        <button type="button" class="btn btn-rose" style="flex: 1; justify-content: center;" onclick="resolveConflictChoice('replace')">
+          Replace This
+        </button>
+        <button type="button" class="btn btn-secondary" style="flex: 1; justify-content: center;" onclick="resolveConflictChoice('skip')">
+          Skip This
+        </button>
+      </div>
+      <div style="display: flex; width: 100%; gap: 8px;">
+        <button type="button" class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="resolveConflictChoice('replace_all')">
+          Replace All Duplicates
+        </button>
+        <button type="button" class="btn btn-glass" style="flex: 1; justify-content: center;" onclick="resolveConflictChoice('skip_all')">
+          Skip All Duplicates
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer" class="toast-container"></div>
+
+
+
+<script src="script.js"></script>
+</body>
+</html>
